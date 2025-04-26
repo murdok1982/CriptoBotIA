@@ -1,0 +1,19 @@
+from config import MAX_RISK_PER_TRADE_PERCENT, TRAILING_STOP_PERCENT
+
+class RiskManager:
+    def __init__(self, client):
+        self.client = client
+
+    def calculate_quantity(self, price):
+        balance = self.client.get_balance()
+        risk_amount = balance * (MAX_RISK_PER_TRADE_PERCENT / 100)
+        quantity = risk_amount / price
+        quantity = round(quantity, 3)  # Redondeo para Futures
+        return quantity
+
+    def get_trailing_stop_price(self, entry_price, side):
+        if side == "BUY":
+            stop_price = entry_price * (1 - (TRAILING_STOP_PERCENT / 100))
+        else:
+            stop_price = entry_price * (1 + (TRAILING_STOP_PERCENT / 100))
+        return round(stop_price, 2)
