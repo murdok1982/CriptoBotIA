@@ -10,8 +10,8 @@ Este bot de trading opera automáticamente en Binance Futures usando:
 
 ## Instalación rápida
 ```bash
-git clone [TU_REPO_LOCAL]
-cd crypto_bot
+git clone https://github.com/murdok1982/CriptoBotIA
+cd CriptoBotIA
 pip install -r requirements.txt
 chmod +x start.sh
 ./start.sh
