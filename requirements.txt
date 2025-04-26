@@ -1,0 +1,7 @@
+binance
+ta
+pandas
+numpy
+websocket-client
+openai
+python-dotenv
