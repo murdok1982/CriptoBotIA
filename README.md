@@ -26,15 +26,15 @@
 - [Strategies](#strategies)
 - [Usage](#usage)
 - [Risk Management](#risk-management)
-- [Performance](#performance)
+- [Support](#support-this-project)
 - [License](#license)
 
-## 🏗️ Architecture
+## 🏛️ Architecture
 
 ```
 CriptoBotIA/
 ├── binance_connector.py      # Binance API integration
-├── brain_gpt_connector.py    # GPT AI decision engine
+├── brain_gpt_connector.py    # GPT AI decision engine ✅ FIXED
 ├── market_listener.py        # Real-time market data
 ├── strategy_manager.py       # Strategy orchestration
 ├── trade_executor.py         # Order execution engine
@@ -71,81 +71,67 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Configure credentials
-cp config.py.example config.py
-# Edit config.py with your API keys
+# Configure environment
+cp .env.example .env
+# Edit .env with your API keys
 
 # Start bot
-bash start.sh
+python brain_gpt_connector.py
 ```
 
 ## ⚙️ Configuration
 
-### config.py
+### .env file
 
-```python
+```env
 # Binance API Configuration
-BINANCE_API_KEY = "your_binance_api_key"
-BINANCE_SECRET_KEY = "your_binance_secret_key"
-BINANCE_TESTNET = True  # Set to False for live trading
+BINANCE_API_KEY=your_binance_api_key
+BINANCE_SECRET_KEY=your_binance_secret_key
+BINANCE_TESTNET=True  # Set to False for live trading
 
 # OpenAI Configuration
-OPENAI_API_KEY = "your_openai_api_key"
-GPT_MODEL = "gpt-4"
+OPENAI_API_KEY=your_openai_api_key
+GPT_MODEL=gpt-4
 
 # Trading Configuration
-TRADING_PAIRS = ["BTCUSDT", "ETHUSDT", "BNBUSDT"]
-BASE_INVESTMENT = 100  # USD per trade
-MAX_POSITIONS = 3
+TRADING_PAIRS=BTCUSDT,ETHUSDT,BNBUSDT
+BASE_INVESTMENT=100  # USD per trade
+MAX_POSITIONS=3
 
 # Risk Management
-STOP_LOSS_PERCENTAGE = 2.0
-TAKE_PROFIT_PERCENTAGE = 4.0
-MAX_DAILY_LOSS = 5.0
-RISK_PER_TRADE = 2.0
+STOP_LOSS_PERCENTAGE=2.0
+TAKE_PROFIT_PERCENTAGE=4.0
+MAX_DAILY_LOSS=5.0
+RISK_PER_TRADE=2.0
 
 # Strategy Configuration
-DEFAULT_STRATEGY = "rsi_macd"
-STRATEGY_SWITCHING = True  # Enable AI-based strategy switching
+DEFAULT_STRATEGY=rsi_macd
+STRATEGY_SWITCHING=True  # Enable AI-based strategy switching
 ```
 
 ## 🎯 Strategies
 
 ### Available Strategies
 
-#### 1. RSI/MACD Strategy (`strategy_rsi_macd.py`)
+#### 1. RSI/MACD Strategy
 ```python
 # Combines RSI and MACD indicators
 # Buy: RSI < 30 and MACD bullish crossover
 # Sell: RSI > 70 or MACD bearish crossover
 ```
 
-#### 2. Bollinger Bands (`strategy_bollinger.py`)
+#### 2. Bollinger Bands
 ```python
 # Mean reversion strategy
 # Buy: Price touches lower band
 # Sell: Price touches upper band
 ```
 
-#### 3. EMA Crossover (`strategy_ema_cross.py`)
+#### 3. EMA Crossover
 ```python
 # Trend following strategy
 # Buy: Fast EMA crosses above Slow EMA
 # Sell: Fast EMA crosses below Slow EMA
-```
-
-#### 4. Breakout Strategy (`strategy_breakout.py`)
-```python
-# Momentum strategy
-# Buy: Price breaks above resistance with volume
-# Sell: Price breaks below support
-```
-
-#### 5. Mean Reversion (`strategy_mean_reversion.py`)
-```python
-# Statistical arbitrage
-# Buy: Price deviates significantly below mean
-# Sell: Price returns to mean
 ```
 
 ### Strategy Performance Comparison
@@ -170,41 +156,19 @@ python brain_gpt_connector.py
 ### Advanced Usage
 
 ```python
-from strategy_manager import StrategyManager
-from brain_gpt_connector import GPTBrain
+from brain_gpt_connector import BrainGPT
 from trade_executor import TradeExecutor
 
 # Initialize components
-strategy_mgr = StrategyManager()
-gpt_brain = GPTBrain(api_key=OPENAI_API_KEY)
+brain = BrainGPT()
 executor = TradeExecutor()
 
 # Get AI recommendation
-market_data = strategy_mgr.get_market_data("BTCUSDT")
-decision = gpt_brain.analyze(market_data)
+market_data = {'price': 45000, 'volume': 1000000}
+indicators = {'rsi': 65, 'macd': 'bullish'}
 
-if decision['action'] == 'BUY':
-    executor.execute_buy(
-        pair="BTCUSDT",
-        amount=decision['amount'],
-        strategy=decision['strategy']
-    )
-```
-
-### Command Line Options
-
-```bash
-# Run specific strategy
-python brain_gpt_connector.py --strategy bollinger
-
-# Run on specific pairs
-python brain_gpt_connector.py --pairs BTCUSDT,ETHUSDT
-
-# Backtest mode
-python brain_gpt_connector.py --backtest --start 2024-01-01
-
-# Paper trading mode
-python brain_gpt_connector.py --paper-trade
+strategy = brain.suggest_strategy(market_data, indicators)
+print(f"Suggested Strategy: {strategy}")
 ```
 
 ## 🛡️ Risk Management
@@ -219,13 +183,6 @@ class RiskManager:
         return min(position_size, MAX_POSITION_SIZE)
 ```
 
-### Stop Loss & Take Profit
-
-- **Dynamic Stop Loss**: Adjusts based on volatility (ATR)
-- **Trailing Stop**: Locks in profits as price moves favorably
-- **Time-based Exit**: Closes positions after max hold time
-- **Portfolio Stop**: Halts trading if daily loss limit reached
-
 ### Risk Controls
 
 ✅ Maximum positions limit  
@@ -233,39 +190,6 @@ class RiskManager:
 ✅ Per-trade risk limit  
 ✅ Exposure limits per asset  
 ✅ Correlation-based diversification  
-
-## 📊 Performance Monitoring
-
-```python
-# View performance metrics
-from portfolio_manager import PortfolioManager
-
-portfolio = PortfolioManager()
-metrics = portfolio.get_performance_metrics()
-
-print(f"Total PnL: ${metrics['total_pnl']:.2f}")
-print(f"Win Rate: {metrics['win_rate']:.1f}%")
-print(f"Sharpe Ratio: {metrics['sharpe_ratio']:.2f}")
-print(f"Max Drawdown: {metrics['max_drawdown']:.2f}%")
-```
-
-### Example Output
-
-```
-================================
-Portfolio Performance Summary
-================================
-Total PnL: $1,234.56
-Win Rate: 64.2%
-Total Trades: 156
-Average Trade: $7.91
-Sharpe Ratio: 2.13
-Max Drawdown: -3.4%
-Best Trade: +$45.20
-Worst Trade: -$18.30
-Active Positions: 2
-================================
-```
 
 ## 🧠 AI Integration
 
@@ -279,33 +203,6 @@ The bot uses GPT-4 to:
 4. **Risk Assessment**: Evaluates trade risk before execution
 5. **Portfolio Rebalancing**: Suggests optimal portfolio allocation
 
-### Example AI Decision
-
-```json
-{
-  "action": "BUY",
-  "pair": "BTCUSDT",
-  "strategy": "ema_cross",
-  "confidence": 0.85,
-  "amount": 0.001,
-  "reasoning": "Strong bullish trend with EMA crossover. High volume confirms momentum.",
-  "stop_loss": 42000,
-  "take_profit": 44000
-}
-```
-
-## 📁 Logging
-
-All trades and decisions are logged:
-
-```
-logs/
-├── trades_2026-02-07.log
-├── decisions_2026-02-07.log
-├── errors_2026-02-07.log
-└── performance_2026-02-07.log
-```
-
 ## ⚠️ Disclaimer
 
 **IMPORTANT: Trading cryptocurrencies involves substantial risk.**
@@ -317,7 +214,38 @@ logs/
 - Never invest more than you can afford to lose
 - The authors are not responsible for any financial losses
 
-## 🔐 Security Best Practices
+## 💰 Support This Project
+
+<div align="center">
+
+### ₿ Bitcoin Donations Welcome!
+
+<img src="https://img.shields.io/badge/Bitcoin-000000?style=for-the-badge&logo=bitcoin&logoColor=white" alt="Bitcoin"/>
+
+```
+┌─────────────────────────────────────┐
+│    ₿  BTC Donation Address  ₿      │
+├─────────────────────────────────────┤
+│                                     │
+│  bc1qqphwht25vjzlptwzjyjt3sex     │
+│  7e3p8twn390fkw                    │
+│                                     │
+│  Network: Bitcoin (BTC)             │
+│  Scan QR ↓                          │
+└─────────────────────────────────────┘
+```
+
+<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=bitcoin:bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw" alt="Bitcoin QR Code" width="200"/>
+
+**Address:** `bc1qqphwht25vjzlptwzjyjt3sex7e3p8twn390fkw`
+
+*Your donations help maintain and improve this trading bot!* 🙏
+
+</div>
+
+---
+
+## 🔒 Security Best Practices
 
 1. ✅ Never commit API keys to version control
 2. ✅ Use IP whitelist on Binance API keys
@@ -347,6 +275,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 - GitHub: [@murdok1982](https://github.com/murdok1982)
 - LinkedIn: [Gustavo Lobato Clara](https://www.linkedin.com/in/gustavo-lobato-clara-2b446b102/)
+- Email: gustavolobatoclara@gmail.com
 
 ## 🙏 Acknowledgments
 
