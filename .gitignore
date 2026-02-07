@@ -1,0 +1,51 @@
+# Environment
+.env
+.env.local
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+venv/
+env/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Logs
+logs/
+*.log
+trades*.log
+
+# Data
+*.db
+*.sqlite
+*.csv
+historical_data/
+backtest_results/
+
+# Secrets
+config.ini
+secrets.json
+*.pem
+*.key
+RiskManager
+base_de_datos*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
